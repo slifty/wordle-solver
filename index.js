@@ -74,6 +74,17 @@ function preprocess(encodedWordPool) {
 	return processedWordPool
 }
 
+function countUniqueLetters(word) {
+	return [...new Set(word)].length
+}
+
+function getWeightedWordScore(wordScore) {
+	return {
+		...wordScore,
+		weightedScore: wordScore.score * countUniqueLetters(wordScore.word),
+	}
+}
+
 function getViableOptions(
 	encodedWordPool,
 	processedWords,
@@ -97,8 +108,9 @@ function getViableOptions(
 		},
 		encodedWordPool,
 	)
-	const scoredOptions = viableOptions.map(viableOption => [viableOption, wordScores[viableOption]])
-	scoredOptions.sort((a, b ) => (a[1].score <= b[1].score) ? 1 : -1)
+
+	const scoredOptions = viableOptions.map(viableOption => [viableOption, getWeightedWordScore(wordScores[viableOption])])
+	scoredOptions.sort((a, b ) => (a[1].weightedScore <= b[1].weightedScore) ? 1 : -1)
 
 	return scoredOptions
 }
@@ -222,7 +234,7 @@ const viableOptions = getViableOptions(
 // _#, where # is 1-5, means the letter is NOT the 1st / 2nd / etc letter of the word
 // ?#, where # is 1-5, means the letter exists and is NOT the 1st / 2nd / etc letter of the word
 const knownLetters = [
-	// e.g. { value: 'b', type: '?5'},
+	// { value: 'b', type: '?5'},
 ]
 
 console.log(`${viableOptions.length} viable options`)
