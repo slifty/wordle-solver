@@ -138,6 +138,51 @@ function filterByKnowledge(
 				return filteredOptions.filter(
 					viableOption => viableOption[1].word.charAt(4) === knownLetter.value
 				)
+			case '_1':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(0) !== knownLetter.value
+				)
+			case '_2':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(1) !== knownLetter.value
+				)
+			case '_3':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(2) !== knownLetter.value
+				)
+			case '_4':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(3) !== knownLetter.value
+				)
+			case '_5':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(4) !== knownLetter.value
+				)
+			case '?1':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(0) !== knownLetter.value
+						&& viableOption[1].word.includes(knownLetter.value)
+				)
+			case '?2':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(1) !== knownLetter.value
+						&& viableOption[1].word.includes(knownLetter.value)
+				)
+			case '?3':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(2) !== knownLetter.value
+						&& viableOption[1].word.includes(knownLetter.value)
+				)
+			case '?4':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(3) !== knownLetter.value
+						&& viableOption[1].word.includes(knownLetter.value)
+				)
+			case '?5':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(4) !== knownLetter.value
+						&& viableOption[1].word.includes(knownLetter.value)
+				)
 			}
 		},
 		viableOptions,
@@ -161,14 +206,7 @@ const processedWords = JSON.parse(fs.readFileSync('data/processedWords.json'));
 // x means green box (hit)
 // ? means yellow box (displaced)
 guessPatterns = [
-	'__x?_',
-	'xxx__',
-	'xxxx_',
-	'xx_?_',
-	'____x',
-	'_xx_x',
-	'_x__x',
-	'_xx?x',
+	// e.g. 'xx_?_',
 ]
 
 const viableOptions = getViableOptions(
@@ -178,11 +216,13 @@ const viableOptions = getViableOptions(
 )
 
 // Any known letter info goes here.
-// 1-5 means "this is the "1st / 2nd / etc" letter of the word
+// #, where # is 1-5, means "this is the "1st / 2nd / etc" letter of the word
 // ? means this letter exists somewhere in the word
 // _ means the letter does NOT exist in the word
+// _#, where # is 1-5, means the letter is NOT the 1st / 2nd / etc letter of the word
+// ?#, where # is 1-5, means the letter exists and is NOT the 1st / 2nd / etc letter of the word
 const knownLetters = [
-	// e.g. { value: 'b', type: '1'},
+	// e.g. { value: 'b', type: '?5'},
 ]
 
 console.log(`${viableOptions.length} viable options`)
