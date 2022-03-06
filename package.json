@@ -1,0 +1,11 @@
+{
+  "name": "wordle-solver",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:slifty/wordle-solver.git",
+  "author": "Dan Schultz <slifty@gmail.com>",
+  "license": "AGPL-3.0",
+  "scripts": {
+    "start": "node index.js"
+  }
+}
