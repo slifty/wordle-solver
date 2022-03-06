@@ -71,10 +71,10 @@ function preprocess(encodedWordPool) {
 			[encodedWord]: matchCounts,
 		}
 	}, {})
-	fs.writeFileSync('data/processedWords2.json', JSON.stringify(processedWordPool))
+	return processedWordPool
 }
 
-function getBestGuess(
+function getViableOptions(
 	encodedWordPool,
 	processedWords,
 	guessPatterns,
@@ -103,16 +103,63 @@ function getBestGuess(
 	return scoredOptions
 }
 
+function filterByKnowledge(
+	viableOptions,
+	knownLetters,
+) {
+	return knownLetters.reduce(
+		(filteredOptions, knownLetter) => {
+			switch (knownLetter.type) {
+			case '_':
+				return filteredOptions.filter(
+					viableOption => !viableOption[1].word.includes(knownLetter.value)
+				)
+			case '?':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.includes(knownLetter.value)
+				)
+			case '1':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(0) === knownLetter.value
+				)
+			case '2':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(1) === knownLetter.value
+				)
+			case '3':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(2) === knownLetter.value
+				)
+			case '4':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(3) === knownLetter.value
+				)
+			case '5':
+				return filteredOptions.filter(
+					viableOption => viableOption[1].word.charAt(4) === knownLetter.value
+				)
+			}
+		},
+		viableOptions,
+	)
+}
+
 const encodedAnswers = JSON.parse(fs.readFileSync('data/encodedAnswers.json'));
 const encodedWords = JSON.parse(fs.readFileSync('data/encodedWords.json'));
-const processedWords = JSON.parse(fs.readFileSync('data/processedWords.json'));
 const encodedWordPool = shuffle([
 	...encodedAnswers,
 	...encodedWords,
 ])
 
-// preprocess(encodedWordPool);
+// This only has to be run once...
+// const processedWords = preprocess(encodedWordPool);
+// fs.writeFileSync('data/processedWords.json', JSON.stringify(processedWords))
+const processedWords = JSON.parse(fs.readFileSync('data/processedWords.json'));
 
+// Any SHARE results go here.
+// _ means black box (miss)
+// x means green box (hit)
+// ? means yellow box (displaced)
 guessPatterns = [
 	'__x?_',
 	'xxx__',
@@ -124,13 +171,28 @@ guessPatterns = [
 	'_xx?x',
 ]
 
-const viableOptions = getBestGuess(
-	encodedAnswers,
+const viableOptions = getViableOptions(
+	encodedWordPool,
 	processedWords,
 	guessPatterns,
 )
 
+// Any known letter info goes here.
+// 1-5 means "this is the "1st / 2nd / etc" letter of the word
+// ? means this letter exists somewhere in the word
+// _ means the letter does NOT exist in the word
+const knownLetters = [
+	// e.g. { value: 'b', type: '1'},
+]
+
 console.log(`${viableOptions.length} viable options`)
 
-fs.writeFileSync('guesses.json', JSON.stringify(viableOptions, null, 2))
+const informedViableOptions = filterByKnowledge(
+	viableOptions,
+	knownLetters,
+)
+
+console.log(`${informedViableOptions.length} INFORMED viable options`)
+
+fs.writeFileSync('guesses.json', JSON.stringify(informedViableOptions, null, 2))
 
